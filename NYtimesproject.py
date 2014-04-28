@@ -26,6 +26,7 @@ def create_file():
     todays_date=todays_date.split('-')
     todays_date=todays_date[0]+todays_date[1]+todays_date[2]
     news_file=open(todays_date+".txt", "a")
+    #attention: this link uses my API key. I reccomend you get your own! 
     nytimes_link= "http://api.nytimes.com/svc/search/v2/articlesearch.json?q=middle+east&fq=subsection_name%3A%28%22Middle+East%22%29&begin_date={0}&fl=web_url%2Cheadline&api-key=8eac4eb4e55fbc7fc74d9a6898467d14%3A4%3A68857836".format(todays_date)
     response=urllib2.urlopen(nytimes_link).read()
     print response
