@@ -1,13 +1,3 @@
-#-------------------------------------------------------------------------------
-# Name:        module1
-# Purpose:
-#
-# Author:      Acer Customer
-#
-# Created:     02/03/2014
-# Copyright:   (c) Acer Customer 2014
-# Licence:     <your licence>
-#-------------------------------------------------------------------------------
 
 from bs4 import BeautifulSoup
 from bs4.diagnose import diagnose
