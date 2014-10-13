@@ -1,21 +1,50 @@
-
+import json, requests, re, os, time
+import json
+from datetime import date
 from bs4 import BeautifulSoup
-from bs4.diagnose import diagnose
-import requests
-
-def get_text(url):
+import conf 
+"""
+this function returns the text of the article from the url
+"""
+def get_article(url):
     data=""
-    p=requests.get(url).content
-    return p
-    print type(p)
-    soup=BeautifulSoup(p)
-    print type(soup)
-    print soup
-    paragraphs=soup.select("p.story-body-text.story-content")
-    data=p
+    html=requests.get(url).content
+    match=re.findall(r'<p class="story-body-text story-content".*?</p>', html)
     text=""
-    for paragraph in paragraphs:
-        text+=paragraph.text
-    text=text.encode('ascii', 'ignore')
-    return str(text)
-print get_text("http://www.nytimes.com/2014/02/23/magazine/instagram-travel-diary.html?nav&_r=0")
+    for article in match:
+        content=BeautifulSoup(article)
+        text+=content.get_text()
+    text=text.encode("ascii", "ignore")
+    return text
+
+"""
+Creates the file by using get article. Prints the File by using print_file
+if you run this, it will print out all of the articles
+"""
+def create_file():
+    todays_date=str(date.today())
+    todays_date=todays_date.split('-')
+    todays_date=todays_date[0]+todays_date[1]+todays_date[2]
+    news_file=open(todays_date+".txt", "a")
+    nytimes_link= "http://api.nytimes.com/svc/search/v2/articlesearch.json"
+    url_parameters={
+        "q":"middle east",
+        "fq":'subsection_name:("Middle East")',
+        "begin_date":todays_date,
+        "fl":"web_url,headline",
+        "api-key":conf.api_key["api"]
+    }
+    response=requests.get(nytimes_link, params=url_parameters).text
+    response_loaded=json.loads(response)
+    for article in response_loaded["response"]["docs"]:
+        headline=article["headline"]["main"]
+        headline=headline.encode('ascii', 'ignore')
+        news_file.write(headline)
+        news_file.write("\n \n")
+        news_file.write(get_article(article["web_url"]))
+        news_file.write("\n \n")
+    news_file.close()
+    print_file(todays_date)
+
+def print_file(file_name):
+    os.system('lpr /home/pi/Desktop/NYT/'+ file_name+".txt")
